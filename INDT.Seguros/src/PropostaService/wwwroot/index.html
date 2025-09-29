@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>INDT.Seguros - UI</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <style>
+    body{font-family:Segoe UI,Arial;margin:20px}
+    input,button{padding:6px;margin:4px}
+    table{border-collapse:collapse;width:100%;margin-top:10px}
+    th,td{border:1px solid #ddd;padding:8px}
+    th{background:#f0f0f0}
+  </style>
+</head>
+<body>
+  <h1>INDT.Seguros - Propostas</h1>
+
+  <section>
+    <h3>Criar proposta</h3>
+    <input id="cliente" placeholder="Cliente" />
+    <input id="valor" placeholder="Valor" type="number" />
+    <input id="descricao" placeholder="Descrição" />
+    <button onclick="createProposal()">Criar</button>
+  </section>
+
+  <section>
+    <h3>Propostas</h3>
+    <button onclick="listProposals()">Atualizar lista</button>
+    <table id="propostasTable">
+      <thead><tr><th>Id</th><th>Cliente</th><th>Valor</th><th>Status</th><th>Ações</th></tr></thead>
+      <tbody></tbody>
+    </table>
+  </section>
+
+  <script>
+    const propostasApi = (path) => `http://localhost:5001/api/propostas${path ?? ''}`;
+    const contratacoesApi = (path) => `http://localhost:5002/api/contratacoes${path ?? ''}`;
+
+    async function createProposal(){
+      const cliente = document.getElementById('cliente').value;
+      const valor = parseFloat(document.getElementById('valor').value || 0);
+      const descricao = document.getElementById('descricao').value;
+      const res = await fetch(propostasApi(''), {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ cliente, valor, descricao })
+      });
+      if (res.ok) {
+        alert('Proposta criada!');
+        listProposals();
+      } else {
+        alert('Erro ao criar proposta');
+      }
+    }
+
+    async function listProposals(){
+      const res = await fetch(propostasApi(''));
+      const data = await res.json();
+      const tbody = document.querySelector('#propostasTable tbody');
+      tbody.innerHTML = '';
+      data.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${p.id}</td>
+          <td>${p.cliente}</td>
+          <td>${p.valor}</td>
+          <td>${p.status}</td>
+          <td>
+            <button onclick='approve("${p.id}")' ${p.status !== 'EmAnalise' ? 'disabled' : ''}>Aprovar</button>
+            <button onclick='contratar("${p.id}")' ${p.status === 'Aprovada' ? '' : 'disabled'}>Contratar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function approve(id){
+      const res = await fetch(propostasApi(`/${id}/status`), {
+        method: 'PUT',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ status: "Aprovada" })
+      });
+      if (res.ok) { alert('Aprovada!'); listProposals(); }
+      else alert('Erro ao aprovar');
+    }
+
+    async function contratar(id){
+      // chama ContratacaoService (rota em 5002) - requer CORS no ContratacaoService
+      const res = await fetch(contratacoesApi(''), {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ propostaId: id, contratadoPor: "Usuário UI" })
+      });
+      if (res.ok) { alert('Contratação realizada!'); }
+      else {
+        const txt = await res.text();
+        alert('Erro ao contratar: ' + res.status + ' - ' + txt);
+      }
+    }
+
+    // carrega lista ao abrir
+    listProposals();
+  </script>
+</body>
+</html>
