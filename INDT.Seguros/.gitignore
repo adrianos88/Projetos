@@ -1,0 +1,42 @@
+# Build
+bin/
+obj/
+
+# User-specific files
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+# Visual Studio / VS Code
+.vs/
+.vscode/
+
+# SQLite DB files (não versionar bases locais)
+*.db
+*.sqlite
+*.sqlite3
+
+# Logs and temp
+*.log
+*.tmp
+*.temp
+
+# Rider
+.idea/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# dotnet tools
+.dotnet/tools/
+
+# Publish output
+publish/
+
+# Other
+*.vsix
+*.nupkg
