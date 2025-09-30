@@ -156,3 +156,4 @@ C:\Projetos\INDT.Seguros\src\PropostaService\obj\Debug\net9.0\refint\PropostaSer
 C:\Projetos\INDT.Seguros\src\PropostaService\obj\Debug\net9.0\PropostaService.pdb
 C:\Projetos\INDT.Seguros\src\PropostaService\obj\Debug\net9.0\PropostaService.genruntimeconfig.cache
 C:\Projetos\INDT.Seguros\src\PropostaService\obj\Debug\net9.0\ref\PropostaService.dll
+C:\Projetos\INDT.Seguros\src\PropostaService\obj\Debug\net9.0\PropostaService.sourcelink.json

@@ -1,51 +1,53 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+using PropostaService.Application;
 using PropostaService.Domain;
-using PropostaService.Infra;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace PropostaService.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-public class PropostasController : ControllerBase
+namespace PropostaService.Controllers
 {
-    private readonly AppDbContext _db;
-    public PropostasController(AppDbContext db) => _db = db;
-
-    public record CreatePropostaDto(string Cliente, decimal Valor, string Descricao);
-    public record UpdateStatusDto(PropostaStatus Status);
-
-    [HttpPost]
-    public async Task<ActionResult<Proposta>> Create(CreatePropostaDto dto)
+    [ApiController]
+    [Route("api/[controller]")]
+    public class PropostasController : ControllerBase
     {
-        var p = new Proposta { Cliente = dto.Cliente, Valor = dto.Valor, Descricao = dto.Descricao };
-        _db.Propostas.Add(p);
-        await _db.SaveChangesAsync();
-        return CreatedAtAction(nameof(GetById), new { id = p.Id }, p);
-    }
+        private readonly IPropostaAppService _app;
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<Proposta>>> GetAll()
-        => await _db.Propostas.AsNoTracking().OrderByDescending(p => p.CriadaEm).ToListAsync();
+        public PropostasController(IPropostaAppService app) => _app = app;
 
-    [HttpGet("{id:guid}")]
-    public async Task<ActionResult<Proposta>> GetById(Guid id)
-    {
-        var p = await _db.Propostas.FindAsync(id);
-        return p is null ? NotFound() : Ok(p);
-    }
+        public record CreatePropostaDto(string Cliente, decimal Valor, string Descricao);
+        public record UpdateStatusDto(PropostaStatus Status);
 
-    [HttpPut("{id:guid}/status")]
-    public async Task<IActionResult> UpdateStatus(Guid id, UpdateStatusDto dto)
-    {
-        var p = await _db.Propostas.FindAsync(id);
-        if (p is null) return NotFound();
+        [HttpPost]
+        public async Task<ActionResult<Proposta>> Create(CreatePropostaDto dto)
+        {
+            try
+            {
+                var p = await _app.CreateAsync(dto.Cliente, dto.Valor, dto.Descricao);
+                return CreatedAtAction(nameof(GetById), new { id = p.Id }, p);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
 
-        if (p.Status != PropostaStatus.EmAnalise)
-            return BadRequest("Status só pode ser alterado a partir de EmAnalise.");
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Proposta>>> GetAll()
+            => Ok(await _app.ListAsync());
 
-        p.Status = dto.Status;
-        await _db.SaveChangesAsync();
-        return NoContent();
+        [HttpGet("{id:guid}")]
+        public async Task<ActionResult<Proposta>> GetById(Guid id)
+        {
+            var p = await _app.GetByIdAsync(id);
+            return p is null ? NotFound() : Ok(p);
+        }
+
+        [HttpPut("{id:guid}/status")]
+        public async Task<IActionResult> UpdateStatus(Guid id, UpdateStatusDto dto)
+        {
+            var ok = await _app.ChangeStatusAsync(id, dto.Status);
+            return ok ? NoContent() : BadRequest("Não foi possível alterar o status.");
+        }
     }
 }

@@ -1,12 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using PropostaService.Infra;
+using PropostaService.Domain;
+using PropostaService.Application;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // SQLite local (arquivo proposals.db)
 builder.Services.AddDbContext<AppDbContext>(opt =>
     opt.UseSqlite("Data Source=proposals.db"));
+
+// Registrar ports & adapters e application services
+builder.Services.AddScoped<IPropostaRepository, PropostaRepositoryEf>();
+builder.Services.AddScoped<IPropostaAppService, PropostaAppService>();
 
 // permitir que a UI (serve neste mesmo serviço) faça requisições
 builder.Services.AddCors(options =>

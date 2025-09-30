@@ -154,3 +154,4 @@ C:\Projetos\INDT.Seguros\src\ContratacaoService\obj\Debug\net9.0\refint\Contrata
 C:\Projetos\INDT.Seguros\src\ContratacaoService\obj\Debug\net9.0\ContratacaoService.pdb
 C:\Projetos\INDT.Seguros\src\ContratacaoService\obj\Debug\net9.0\ContratacaoService.genruntimeconfig.cache
 C:\Projetos\INDT.Seguros\src\ContratacaoService\obj\Debug\net9.0\ref\ContratacaoService.dll
+C:\Projetos\INDT.Seguros\src\ContratacaoService\obj\Debug\net9.0\ContratacaoService.sourcelink.json
