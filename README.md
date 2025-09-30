@@ -156,6 +156,47 @@ curl -X POST http://localhost:5002/api/contratacoes   -H "Content-Type: applicat
 
 ---
 
+---
+
+## ✅ Como executar os testes
+
+O projeto utiliza **xUnit** como framework de testes. Você pode executar os testes de forma **individual** (por serviço) ou **todos de uma vez** a partir da raiz do projeto.
+
+### ▶️ Executar todos os testes de uma vez (recomendado)
+
+Este é o padrão mais utilizado em projetos profissionais e pipelines de CI/CD:
+
+```bash
+dotnet test
+
+
+O .NET irá:
+
+Restaurar os pacotes necessários
+
+Compilar os serviços e os projetos de teste
+
+
+▶️Executar automaticamente todos os testes encontrados nas pastas tests/*
+
+O resultado esperado é semelhante a:
+
+Resumo do teste: total: X; falhou: 0; bem-sucedido: X
+
+Executar os testes individualmente
+
+Caso deseje rodar os testes de apenas um serviço:
+
+dotnet test tests/Proposta.Tests
+
+ou
+
+dotnet test tests/Contratacao.Tests
+
+
+Dica: durante o desenvolvimento, você pode utilizar -v n para ver mais detalhes:
+
+dotnet test -v n
 
 
 
